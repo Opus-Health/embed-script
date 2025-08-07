@@ -28,7 +28,7 @@
         local: 'http://localhost:5173'
     };
 
-    var IFRAME_SRC = ENV_URL_MAP[BRANCH] || ENV_URL_MAP.main;
+    var IFRAME_SRC = 'https://calculator.opushealth.io';
     console.log('IFRAME_SRC', IFRAME_SRC);
     var IFRAME_ID = 'hsa-calculator-iframe-' + Date.now();
 
@@ -38,7 +38,7 @@
 
         var container = document.createElement('div');
         container.setAttribute('data-hsa-calculator', 'true');
-        container.style.cssText = 'margin: 20px 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
+        //container.style.cssText = 'margin: 20px 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
 
         var iframe = document.createElement('iframe');
         iframe.id = IFRAME_ID;
