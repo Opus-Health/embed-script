@@ -29,6 +29,7 @@
     };
 
     var IFRAME_SRC = ENV_URL_MAP[BRANCH] || ENV_URL_MAP.main;
+    console.log('IFRAME_SRC', IFRAME_SRC);
     var IFRAME_ID = 'hsa-calculator-iframe-' + Date.now();
 
     function createCalculator() {
