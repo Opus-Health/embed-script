@@ -49,7 +49,12 @@
         iframe.frameBorder = '0';
 
         container.appendChild(iframe);
+        var target = document.getElementById('hsa-calculator-placeholder');
+        if (target) {
+        target.appendChild(container);
+        } else {
         document.body.insertBefore(container, document.body.firstChild);
+        }
         return iframe;
     }
 
