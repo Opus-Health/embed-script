@@ -28,7 +28,7 @@
         local: 'http://localhost:5173'
     };
 
-    var IFRAME_SRC = ENV_URL_MAP[BRANCH] || ENV_URL_MAP.main;
+    var IFRAME_SRC = 'http://localhost:5173';
     console.log('IFRAME_SRC', IFRAME_SRC);
     var IFRAME_ID = 'hsa-calculator-iframe-' + Date.now();
 
