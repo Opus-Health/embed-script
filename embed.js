@@ -28,7 +28,7 @@
         local: 'http://localhost:5173'
     };
 
-    var IFRAME_SRC = 'https://calculator.opushealth.io';
+    var IFRAME_SRC = 'https://calculator.opushealth.io/widget';
     console.log('IFRAME_SRC', IFRAME_SRC);
     var IFRAME_ID = 'hsa-calculator-iframe-' + Date.now();
 
