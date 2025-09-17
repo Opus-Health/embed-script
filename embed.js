@@ -54,6 +54,54 @@
     console.log('IFRAME_SRC:', IFRAME_SRC);
     var IFRAME_ID = 'hsa-calculator-iframe-' + Date.now();
 
+    function createLoader() {
+        var loader = document.createElement('div');
+        loader.className = 'opus-widget-loader';
+        loader.style.cssText = `
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #666;
+            font-size: 14px;
+        `;
+        
+        var spinner = document.createElement('div');
+        spinner.style.cssText = `
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e0e0e0;
+            border-top: 2px solid #007acc;
+            border-radius: 50%;
+            animation: opus-spin 1s linear infinite;
+            margin-right: 10px;
+        `;
+        
+        var text = document.createElement('span');
+        text.textContent = 'Loading...';
+        
+        loader.appendChild(spinner);
+        loader.appendChild(text);
+        
+        // Add CSS animation keyframes if not already added
+        if (!document.getElementById('opus-loader-styles')) {
+            var styles = document.createElement('style');
+            styles.id = 'opus-loader-styles';
+            styles.textContent = `
+                @keyframes opus-spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(styles);
+        }
+        
+        return loader;
+    }
+
     function createCalculator() {
         var existing = document.querySelector('[data-hsa-calculator]');
         if (existing) existing.remove();
@@ -63,13 +111,31 @@
         container.setAttribute('data-widget-type', WIDGET_TYPE);
         //container.style.cssText = 'margin: 20px 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
 
+        // Create and show loader first
+        var loader = createLoader();
+        container.appendChild(loader);
+
         var iframe = document.createElement('iframe');
         iframe.id = IFRAME_ID;
         iframe.src = IFRAME_SRC;
         iframe.title = WIDGET_TYPE === 'payment_methods' ? 'Payment Methods' : 'HSA/FSA Savings Calculator';
-        iframe.style.cssText = 'width: 100%; height: 200px; border: none; transition: height 0.3s ease-in-out; display: block;';
+        iframe.style.cssText = 'width: 100%; height: 200px; border: none; transition: height 0.3s ease-in-out; display: none;';
         iframe.scrolling = 'no';
         iframe.frameBorder = '0';
+
+        // Handle iframe load completion
+        iframe.onload = function() {
+            loader.remove();
+            iframe.style.display = 'block';
+            console.log('Iframe loaded, loader removed');
+        };
+
+        // Handle iframe load error
+        iframe.onerror = function() {
+            loader.style.color = '#dc3545';
+            loader.querySelector('span').textContent = 'Failed to load widget';
+            console.error('Failed to load iframe');
+        };
 
         container.appendChild(iframe);
         var target = document.getElementById('hsa-calculator-placeholder');
