@@ -6,21 +6,35 @@
     }
     window.opusWidgetLoaded = true;
 
-    // Extract parameters from script src URL
+    // Extract parameters from script data attributes or src URL
     function getScriptParams() {
         var scripts = document.getElementsByTagName('script');
         var currentScript = scripts[scripts.length - 1];
+        
+        // First, try to get parameters from data attributes
+        var account_id = currentScript.getAttribute('data-opus-account-id');
+        var widget_type = currentScript.getAttribute('data-opus-widget-type');
+        
+        // If data attributes are found, use them
+        if (account_id || widget_type) {
+            return { 
+                account_id: account_id || 1,  //using the default account id of awaken to maintain backwards compatibility
+                widget_type: widget_type || 'hsa_calculator' 
+            };
+        }
+        
+        // Fallback to URL parameters if data attributes are not found
         var src = currentScript.src;
         
         if (!src) {
-            console.error('Could not find script src URL');
+            console.error('Could not find script src URL or data attributes');
             return { account_id: null, widget_type: 'hsa_calculator' };
         }
         
         try {
             var url = new URL(src);
-            var account_id = url.searchParams.get('account_id');
-            var widget_type = url.searchParams.get('widget_type') || 'hsa_calculator';
+            account_id = url.searchParams.get('account_id') || 1; //using the default account id of awaken to maintain backwards compatibility
+            widget_type = url.searchParams.get('widget_type') || 'hsa_calculator';
             
             return { account_id: account_id, widget_type: widget_type };
         } catch (error) {
@@ -36,7 +50,12 @@
     // Determine iframe src based on widget type
     var IFRAME_SRC;
     if (WIDGET_TYPE === 'hsa_calculator') {
-        IFRAME_SRC = 'https://calculator.opushealth.io/expanded';
+        if (!ACCOUNT_ID) {
+            console.error('account_id is required for hsa_calculator widget type');
+            IFRAME_SRC = 'https://calculator.opushealth.io/expanded'; // fallback
+        } else {
+            IFRAME_SRC = 'https://calculator.opushealth.io/' + ACCOUNT_ID + '/expanded';
+        }
     } else if (WIDGET_TYPE === 'payment_methods') {
         if (!ACCOUNT_ID) {
             console.error('account_id is required for payment_methods widget type');
