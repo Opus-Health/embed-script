@@ -10,6 +10,8 @@
     function getCurrentScript() {
         // Method 1: Use document.currentScript (modern browsers)
         if (document.currentScript) {
+            console.log('Using document.currentScript');
+            console.log(document.currentScript);
             return document.currentScript;
         }
         
@@ -19,7 +21,7 @@
             var script = scripts[i];
             if (script.getAttribute('data-opus-account-id') || 
                 script.getAttribute('data-opus-widget-type') ||
-                (script.src && script.src.indexOf('embed') !== -1)) {
+                (script.src && script.src.toLowerCase().indexOf('opus-health') !== -1)) {
                 return script;
             }
         }
@@ -28,8 +30,7 @@
         for (var i = 0; i < scripts.length; i++) {
             var script = scripts[i];
             if (script.src && (
-                script.src.indexOf('embed.js') !== -1 ||
-                script.src.indexOf('embed-function-exposed.js') !== -1 ||
+                script.src.toLowerCase().indexOf('opus-health') !== -1 ||
                 script.src.match(/account_id=|widget_type=/)
             )) {
                 return script;
