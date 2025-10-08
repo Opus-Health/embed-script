@@ -10,8 +10,6 @@
     function getCurrentScript() {
         // Method 1: Use document.currentScript (modern browsers)
         if (document.currentScript) {
-            console.log('Using document.currentScript');
-            console.log(document.currentScript);
             return document.currentScript;
         }
         
