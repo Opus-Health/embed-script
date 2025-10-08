@@ -6,10 +6,49 @@
     }
     window.opusWidgetLoaded = true;
 
+    // Robust script detection function
+    function getCurrentScript() {
+        // Method 1: Use document.currentScript (modern browsers)
+        if (document.currentScript) {
+            return document.currentScript;
+        }
+        
+        // Method 2: Look for script with our unique data attributes
+        var scripts = document.getElementsByTagName('script');
+        for (var i = 0; i < scripts.length; i++) {
+            var script = scripts[i];
+            if (script.getAttribute('data-opus-account-id') || 
+                script.getAttribute('data-opus-widget-type') ||
+                (script.src && script.src.indexOf('embed') !== -1)) {
+                return script;
+            }
+        }
+        
+        // Method 3: Look for script by src pattern (if loaded from URL)
+        for (var i = 0; i < scripts.length; i++) {
+            var script = scripts[i];
+            if (script.src && (
+                script.src.indexOf('embed.js') !== -1 ||
+                script.src.indexOf('embed-function-exposed.js') !== -1 ||
+                script.src.match(/account_id=|widget_type=/)
+            )) {
+                return script;
+            }
+        }
+        
+        // Method 4: Fallback to last script (original method, but with warning)
+        console.warn('Could not reliably detect current script, falling back to last script element');
+        return scripts[scripts.length - 1];
+    }
+
     // Extract parameters from script data attributes or src URL
     function getScriptParams() {
-        var scripts = document.getElementsByTagName('script');
-        var currentScript = scripts[scripts.length - 1];
+        var currentScript = getCurrentScript();
+        
+        if (!currentScript) {
+            console.error('Could not detect current script element');
+            return { account_id: 1, widget_type: 'hsa_calculator' }; // safe defaults
+        }
         
         // First, try to get parameters from data attributes
         var account_id = currentScript.getAttribute('data-opus-account-id');
