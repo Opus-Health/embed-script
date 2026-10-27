@@ -14,12 +14,14 @@
         // First, try to get parameters from data attributes
         var account_id = currentScript.getAttribute('data-opus-account-id');
         var widget_type = currentScript.getAttribute('data-opus-widget-type');
+        var language = currentScript.getAttribute('data-opus-language');
         
         // If data attributes are found, use them
         if (account_id || widget_type) {
             return { 
                 account_id: account_id || 1,  //using the default account id of awaken to maintain backwards compatibility
-                widget_type: widget_type || 'hsa_calculator' 
+                widget_type: widget_type || 'hsa_calculator',
+                language: language
             };
         }
         
@@ -35,8 +37,9 @@
             var url = new URL(src);
             account_id = url.searchParams.get('account_id') || 1; //using the default account id of awaken to maintain backwards compatibility
             widget_type = url.searchParams.get('widget_type') || 'hsa_calculator';
+            language = url.searchParams.get('language');
             
-            return { account_id: account_id, widget_type: widget_type };
+            return { account_id: account_id, widget_type: widget_type, language: language };
         } catch (error) {
             console.error('Error parsing script URL:', error);
             return { account_id: null, widget_type: 'hsa_calculator' };
@@ -47,6 +50,8 @@
     var params = getScriptParams();
     var ACCOUNT_ID = params.account_id;
     var WIDGET_TYPE = params.widget_type;
+    // Optional language code (e.g. 'es'); omitted means English
+    var LANGUAGE = params.language ? String(params.language).toLowerCase() : null;
 
     // Determine iframe src based on widget type
     var IFRAME_SRC;
@@ -68,8 +73,12 @@
         console.warn('Unknown widget type:', WIDGET_TYPE, 'defaulting to hsa_calculator');
         IFRAME_SRC = 'https://calculator.opushealth.io/expanded';
     }
+
+    if (LANGUAGE) {
+        IFRAME_SRC += '?lang=' + encodeURIComponent(LANGUAGE);
+    }
     
-    console.log('Widget params:', { account_id: ACCOUNT_ID, widget_type: WIDGET_TYPE });
+    console.log('Widget params:', { account_id: ACCOUNT_ID, widget_type: WIDGET_TYPE, language: LANGUAGE });
     console.log('IFRAME_SRC:', IFRAME_SRC);
     var IFRAME_ID = 'hsa-calculator-iframe-' + Date.now();
 
@@ -100,7 +109,7 @@
         `;
         
         var text = document.createElement('span');
-        text.textContent = 'Loading...';
+        text.textContent = LANGUAGE === 'es' ? 'Cargando...' : 'Loading...';
         
         loader.appendChild(spinner);
         loader.appendChild(text);
